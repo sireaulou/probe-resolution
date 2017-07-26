@@ -1,8 +1,9 @@
 //Vincent Ching-Roa
-//Last edit: 07/25/2017
+//Last edit: 07/26/2017
 //Description: 
 //Symmetrical probe gene to be used with genetic algorithm
 //Log: changed mate method from static to instance based
+//Fixed x-mutation for middle odd sources
 
 package genetic;
 import probe.*;
@@ -69,19 +70,6 @@ public class ProbeGeneSymmetrical extends Gene{
 			probe.addDetector(detector);
 		}
 		this.res();
-	}
-	
-	//calculate the extrapolated resolution
-	@Override
-	public double res(){
-		res = controller.fitness2(controller.svdDirectNoOutputLimit(probe,phantom), alpha, L);
-		return res;
-	}
-	//calculate the two-output fitness 
-	@Override
-	public double [] fitness(){
-		fitness = controller.fitness(controller.svdDirectNoOutputLimit(probe,phantom), alpha, L);
-		return fitness;
 	}
 	
 	//mating algorithm. random point crossover with Gene partner
@@ -183,9 +171,7 @@ public class ProbeGeneSymmetrical extends Gene{
 		}
 		if(haveOddSources){
 			if(rand.nextDouble()<=(mutationRate[0]/100d)){
-				int mutationDegreeX = rand.nextInt(2*mutationRate[1]+1)-mutationRate[1];
 				int mutationDegreeY = rand.nextInt(2*mutationRate[1]+1)-mutationRate[1];
-				pos[numSource-1][0] = pos[numSource-1][0]+mutationDegreeX*0.01;
 				pos[numSource-1][1] = pos[numSource-1][1]+mutationDegreeY*0.01;
 			}
 		}
@@ -201,9 +187,7 @@ public class ProbeGeneSymmetrical extends Gene{
 		}
 		if(haveOddDetectors){
 			if(rand.nextDouble()<=(mutationRate[0]/100d)){
-				int mutationDegreeX = rand.nextInt(2*mutationRate[1]+1)-mutationRate[1];
 				int mutationDegreeY = rand.nextInt(2*mutationRate[1]+1)-mutationRate[1];
-				pos[numSource+numDetector-1][0] = pos[numSource+numDetector-1][0]+mutationDegreeX*0.01;
 				pos[numSource+numDetector-1][1] = pos[numSource+numDetector-1][1]+mutationDegreeY*0.01;
 			}
 		}

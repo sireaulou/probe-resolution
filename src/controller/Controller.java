@@ -1,5 +1,5 @@
 //Vincent Ching-Roa
-//Last edit: 07/24/2017
+//Last edit: 07/25/2017
 //Description: 
 //Controller objects which performs analytic solutions
 //Laser properties are contained within the controller
@@ -448,7 +448,7 @@ public class Controller {
 	//Print method into /temp/<filename>.dat 
 	public void printDoubleDat(double [] d, String filename){
 		try{
-			String file = "temp//"+filename+".dat";
+			String file = filename+".dat";
 			FileWriter fstream = new FileWriter(file,true);
 			BufferedWriter out = new BufferedWriter(fstream);
 			for(double val:d){

@@ -48,19 +48,6 @@ public class ProbeGene extends Gene{
 		this.res();
 	}
 	
-	//calculate the extrapolated resolution
-	@Override
-	public double res(){
-		res = controller.fitness2(controller.svdDirectNoOutputLimit(probe,phantom), alpha, L);
-		return res;
-	}
-	//calculate the two-output fitness 
-	@Override
-	public double [] fitness(){
-		fitness = controller.fitness(controller.svdDirectNoOutputLimit(probe,phantom), alpha, L);
-		return fitness;
-	}
-	
 	//mating algorithm. random point crossover with Gene partner
 	@Override
 	public ProbeGene mate(Gene partner){

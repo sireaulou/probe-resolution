@@ -38,11 +38,12 @@ public class CulverReproductions {
 		Phantom phantom = new Phantom(-3,3,0,30,1,1,0.2,0.2,0,0.05,8,1.4);
 		
 		//creating the controller
-		Controller controller = new Controller(1,0.1d,2d*Math.PI*70d*Math.pow(10, 6));
+		Controller controller = new Controller(1,1,2d*Math.PI*70d*Math.pow(10, 6));
 		controller.set_d(6); //for infinite slab geometry
 		
 		//controller analytic solution direct to SVD singular values
 		controller.svdDirect(basename,staticProbe,phantom);
+		System.out.println("Done!");
 	}
 	
 	//Reproduction of Fig.3a
@@ -67,7 +68,8 @@ public class CulverReproductions {
 			controller.set_d(6);
 			filename = basename+(j+1);
 			controller.svdDirect(filename,staticProbe,phantom);		
-		}			
+		}
+		System.out.println("Done!");
 	}
 	
 	//Reproduction of Fig.3b
@@ -91,7 +93,8 @@ public class CulverReproductions {
 			controller.set_d(6);
 			filename = basename+j;
 			controller.svdDirect(filename,staticProbe,phantom);		
-		}	
+		}
+		System.out.println("Done!");
 	}
 	
 	//Reproduction of Fig.4
@@ -114,11 +117,12 @@ public class CulverReproductions {
 			
 			Phantom phantom = new Phantom(-3,depth,0,30,1,1,0.2,0.2,0,0.05,8,1.4);
 			
-			Controller controller = new Controller(1,0.1,2d*Math.PI*70d*Math.pow(10, 6));
+			Controller controller = new Controller(1,1,2d*Math.PI*70d*Math.pow(10, 6));
 			controller.set_d(6);
 			filename = basename+(j+1);
 			controller.svdDirect(filename,staticProbe,phantom);
 		}
+		System.out.println("Done!");
 	}
 	
 	
@@ -182,11 +186,16 @@ public class CulverReproductions {
 
 		controller.svdDirect(basename+"Standard", probeS,phantom);		
 		controller.svdDirect(basename+"Jingxuan",probeJ,phantom);
-	
+		System.out.println("Done!");
 	}
 	
 	//Run whatever you want here.
 	public static void main(String [] args){
-		
+		culver2("culverReproduction//culver2_21mm_8x8",2.1,8);
+		culver2("culverReproduction//culver2_21mm_80x80",2.1,80);
+		culver2("culverReproduction//culver2_87mm_30x30",8.7,30);
+		culver3a("culverReproduction//culver3a_");
+		culver3b("culverReproduction//culver3b_");
+		culver4("culverReproduction//culver4_");
 	}
 }

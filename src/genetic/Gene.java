@@ -21,6 +21,7 @@ public abstract class Gene implements Comparable<Gene>{
 	static double alpha, L;
 	static boolean haveOddSources;
 	static boolean haveOddDetectors;
+	static boolean initialized = false;
 	static Random rand = new Random();
 	//object vars
 	Probe probe; 
@@ -52,6 +53,7 @@ public abstract class Gene implements Comparable<Gene>{
 		} else {
 			haveOddDetectors=true;
 		}
+		initialized = true;
 	}
 	
 	//constructor used to import probe (with blank position array)
@@ -111,10 +113,25 @@ public abstract class Gene implements Comparable<Gene>{
 //		}
 	}	
 	
+	//calculate the extrapolated resolution
+	public double res(){
+		if(!initialized){
+			return 0;
+		}
+		res = controller.fitness2(controller.svdDirectNoOutputLimit(probe,phantom), alpha, L);
+		return res;
+	}
+	//calculate the two-output fitness 
+	public double [] fitness(){
+		if(!initialized){
+			return new double[]{0,0};
+		}
+		fitness = controller.fitness(controller.svdDirectNoOutputLimit(probe,phantom), alpha, L);
+		return fitness;
+	}
+
 	
 	public abstract void initialize();
-	public abstract double res(); //calculate the extrapolated resolution
-	public abstract double[] fitness(); //calculate the two-output fitness 
 	public abstract Gene mate(Gene partner); //mating algorithm. random point crossover with Gene partner
 	public abstract void mutate(); //mutation algorithm
 	public abstract Gene factory(); //gene factory... gotta learn how to do this properly....
