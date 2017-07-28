@@ -81,7 +81,11 @@ public class GeneticAlgorithm<PGene extends Gene> {
 	public void start(PGene t){
 		//Create phantom and controller
 		//set probe gene global properties
-		Phantom phantom = new Phantom(-1,-1,1.5,11,11,11,0.2,0.2,0.2,0.05,8,1.4);
+		Phantom phantom = new Phantom(
+				-1,-1,1.5,
+				11,11,11,
+				0.2,0.2,0.2,0.2,
+				0.05,8,1.4);
 		Controller controller = new Controller(0, 1, 2d*Math.PI*70d*Math.pow(10, 6) );
 		PGene.setGlobalProps(numSource, numDetector, phantom, controller, alpha, L, mutationRate);
 		

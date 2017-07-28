@@ -1,4 +1,0 @@
-culver -> standard S = 1. 
-absCulver -> tried absolute value with z = Math.abs(dz-sz) for infinite slab calculations
-tenthCulver -> S = 0.1 instead of S = 1
-absTenthCulver -> combo of abs and tenth

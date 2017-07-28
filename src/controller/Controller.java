@@ -1,9 +1,10 @@
 //Vincent Ching-Roa
-//Last edit: 07/25/2017
+//Last edit: 07/27/2017
 //Description: 
 //Controller objects which performs analytic solutions
 //Laser properties are contained within the controller
 //Future plan: Might be better to move these properties(s, w) to the source
+//Log: 07/27 changed conversion factor and conversion factor structure
 
 /*READ 
  * COORDINATE SYSTEM
@@ -49,9 +50,6 @@ public class Controller {
 	double c = 3*Math.pow(10,10); //speed of light
 	double s; //intensity
 	double w; //omega frequency 70MHz in most cases
-
-	double v; //speed of light in the medium
-
 	//Green's function stuff
 	double d; //slab thickness for infinite slab
 
@@ -149,15 +147,16 @@ public class Controller {
 			
 		}
 		
-		double constant = (v*s/(4d*Math.PI*D));
-		return constant*output_complex.abs();
+//		double constant = 1/(4*Math.PI);
+//		return constant*output_complex.abs();
+		return output_complex.abs();
 	}
 	
 	/*Greens function for semi-infinite boundary condition
 	 * Returns the absolute value of the solution.
 	 * Refer to Durduran's paper
 	 */
-	public double GSemiInfinite(double position1[], double position2[],double mua, double musp, double n){
+	public double GSemiInfinite(double position1[], double position2[], double mua, double musp, double n){
 		
 		//Calculating v, ltr, D, Reff and zb
 		double v = c/n; //speed of light in the medium
@@ -206,10 +205,11 @@ public class Controller {
 		Complex p6 = p4.div(r_b);
 		Complex output = p5.minus(p6);
 		
-		double constant = (v*s/(4d*Math.PI*D));
-		constant = 1;
+		double constant = 1/(4*Math.PI);
 		return constant*output.abs();
 	}
+	
+	
 
 	/*Calculates weight matrix row 
 	 * Row calculation involves all Greens solution for all voxels
@@ -230,13 +230,17 @@ public class Controller {
 		
 		for(int i = 0; i < phantom.getVoxelList().size(); i++){
 			Voxel currentVoxel = phantom.getVoxelList().get(i);
+			double v = c/currentVoxel.getN(); //speed of light in the medium
+			double ltr = 1/(currentVoxel.getMua()+currentVoxel.getMusp()); //transport free mean path
+			double D = v*ltr/3; // photon diffusion coefficient
+			double conversionFactor = v*Math.pow(currentVoxel.getDim(),3)/D;
 			if(mode == 0){
-				output[i] = 
+				output[i] = conversionFactor*
 						GSemiInfinite(absolute_source_position, currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())*
 						GSemiInfinite(absolute_detector_position, currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())/
 						GSemiInfinite(absolute_source_position, absolute_detector_position, currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN());
 			} else if (mode == 1){
-				output[i] = 
+				output[i] = conversionFactor*
 						GInfiniteSlab(absolute_source_position, currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())*
 						GInfiniteSlab(absolute_detector_position,currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())/
 						GInfiniteSlab(absolute_source_position, absolute_detector_position, currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN());

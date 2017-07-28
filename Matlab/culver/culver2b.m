@@ -4,9 +4,9 @@
 clear;
 addpath('../functions');
 
-svd8x8 = svdLoad('../../culverReproduction/tenthCulver/tenthCulver2_21mm_8x8');
-svd80x80 = svdLoad('../../culverReproduction/tenthCulver/tenthCulver2_21mm_80x80');
-svd30x30 = svdLoad('../../culverReproduction/tenthCulver/tenthCulver2_87mm_30x30');
+svd8x8 = svdLoad('../../culverReproduction/culver2/culver2_21mm_8x8');
+svd80x80 = svdLoad('../../culverReproduction/culver2/culver2_21mm_80x80');
+svd30x30 = svdLoad('../../culverReproduction/culver2/culver2_87mm_30x30');
 
 semilogy(svd8x8)
 hold on

@@ -1,8 +1,9 @@
 //Vincent Ching-Roa
-//Last edit: 07/24/2017
+//Last edit: 07/27/2017
 //Description: 
 //Phantom voxel field. 
 //Should add support for non-rectangular field generation or import 
+//Log: 7/27 added voxel dimension for conversion factor
 
 
 package phantom;
@@ -20,7 +21,7 @@ public class Phantom {
 	public Phantom(
 			double startX, double startY, double startZ,
 			int numX, int numY, int numZ,
-			double dx, double dy, double dz,
+			double dx, double dy, double dz, double voxelDim,
 			double mua, double musp, double n)
 	{
 		for(int i = 0; i < numY; i++){
@@ -30,7 +31,7 @@ public class Phantom {
 							startX + k*dx,
 							startY + i*dy,
 							startZ + j*dz,
-							mua,musp,n);
+							voxelDim,mua,musp,n);
 					voxelList.add(newVoxel);
 				}
 			}

@@ -11,20 +11,20 @@ addpath('../functions');
 L = 60;
 % dx = [3 4.5 6 9 10 11.25 15 18 22.5] mm
 %fixed FOV;
-M = [31 21 16 11 10 9 7 6 5].^2; 
+M = ([31 21 16 11 10 9 7 6 5]).^2; 
 %unfixed FOV;
 % M = 900*ones(9,1);
 N = 900;
 S01 = 0.05;
 S02 = 0.5;
 S03 = 0.5;
-vol = 6*6;
+vol = 6*6*0.2;
 
 for i=1:9
    alpha1 = sqrt(M(i))*(0.0003)/(S01/vol);
    alpha2 = sqrt(M(i))*(0.0003)/(S02/vol);
    alpha3 = sqrt(1/M(i))*(0.001*sqrt(M(i)))/(S03/vol);
-   s{i} = svdLoad(strcat('../../culverReproduction/culver3a_',num2str(i)));
+   s{i} = svdLoad(strcat('../../culverReproduction/culver3aUnfixed/culver3aUnfixed_',num2str(i)));
    diff1 = abs(s{i}-alpha1);
    diff2 = abs(s{i}-alpha2);
    diff3 = abs(s{i}-alpha3);

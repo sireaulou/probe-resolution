@@ -1,5 +1,5 @@
 //Vincent Ching-Roa
-//Last edit: 07/24/2017
+//Last edit: 07/27/2017
 //Description: 
 //Reproduction of Culver's figures. Exports data to be plotted in matlab 
 //Also includes reproduction of Jingxuan's vs. Standard geometry 
@@ -35,7 +35,7 @@ public class CulverReproductions {
 		}
 		
 		//creating the phantom
-		Phantom phantom = new Phantom(-3,3,0,30,1,1,0.2,0.2,0,0.05,8,1.4);
+		Phantom phantom = new Phantom(-3,3,0,30,1,1,0.2,0.2,0,0.2,0.05,8,1.4);
 		
 		//creating the controller
 		Controller controller = new Controller(1,1,2d*Math.PI*70d*Math.pow(10, 6));
@@ -52,7 +52,7 @@ public class CulverReproductions {
 		//dx = [3 4.5 6 9 10 11.25 15 18 22.5] mm
 		double[] dx = {0.3, 0.45, 0.6, 0.9, 1.0, 1.125, 1.5, 1.8, 2.25};
 		for(int j = 0; j<9; j++){ 
-			double xFOV= 18;
+			double xFOV= 9;
 			int numSDpairs = (int) (xFOV/dx[j])+1;
 			Probe staticProbe = new Probe(-xFOV/2,0,0,0,0,0,0);
 			for(int i = 0; i<numSDpairs; i++){
@@ -62,7 +62,7 @@ public class CulverReproductions {
 				staticProbe.addDetector(newDetector);
 			}
 			
-			Phantom phantom = new Phantom(-3,0,0,30,30,1,0.2,0.2,0,0.05,8,1.4);
+			Phantom phantom = new Phantom(-3,0,0,30,30,1,0.2,0.2,0,0.2,0.05,8,1.4);
 			
 			Controller controller = new Controller(1,1,2d*Math.PI*70d*Math.pow(10, 6));
 			controller.set_d(6);
@@ -72,12 +72,38 @@ public class CulverReproductions {
 		System.out.println("Done!");
 	}
 	
+	//Reproduction of Fig.3a Unfixed FOV
+		public static void culver3aUnfixedFOV(String basename){
+			String filename;
+			//dx = [3 4.5 6 9 10 11.25 15 18 22.5] mm
+			double[] dx = {0.3, 0.45, 0.6, 0.9, 1.0, 1.125, 1.5, 1.8, 2.25};
+			for(int j = 0; j<9; j++){ 
+				int numSDpairs = 30;
+				double xFOV = (30-1)*dx[j];
+				Probe staticProbe = new Probe(-xFOV/2,0,0,0,0,0,0);
+				for(int i = 0; i<numSDpairs; i++){
+					Source newSource = new Source(i*dx[j],6,0);
+					Detector newDetector = new Detector(i*dx[j],0,0);	
+					staticProbe.addSource(newSource);
+					staticProbe.addDetector(newDetector);
+				}
+				
+				Phantom phantom = new Phantom(-3,0,0,30,30,1,0.2,0.2,0,0.2,0.05,8,1.4);
+				
+				Controller controller = new Controller(1,1,2d*Math.PI*70d*Math.pow(10, 6));
+				controller.set_d(6);
+				filename = basename+(j+1);
+				controller.svdDirect(filename,staticProbe,phantom);		
+			}
+			System.out.println("Done!");
+		}
+	
 	//Reproduction of Fig.3b
 	public static void culver3b(String basename){
 		String filename;
 		for(int j = 1; j<=8; j++){ //2cm to 16 cm
 			double xFOV= 2*j;
-			int numSDpairs = 30;
+			int numSDpairs = 45;
 			double dx = xFOV/(numSDpairs-1);
 			Probe staticProbe = new Probe(-xFOV/2,0,0,0,0,0,0);
 			for(int i = 0; i<numSDpairs; i++){
@@ -87,7 +113,7 @@ public class CulverReproductions {
 				staticProbe.addDetector(newDetector);
 			}
 			
-			Phantom phantom = new Phantom(-3,0,0,30,30,1,0.2,0.2,0,0.05,8,1.4);
+			Phantom phantom = new Phantom(-3,0,0,30,30,1,0.2,0.2,0,0.2,0.05,8,1.4);
 			
 			Controller controller = new Controller(1,1,2d*Math.PI*70d*Math.pow(10, 6));
 			controller.set_d(6);
@@ -115,7 +141,7 @@ public class CulverReproductions {
 			
 			double depth = 6d - 0.8 - 0.2*j;
 			
-			Phantom phantom = new Phantom(-3,depth,0,30,1,1,0.2,0.2,0,0.05,8,1.4);
+			Phantom phantom = new Phantom(-3,depth,0,30,1,1,0.2,0.2,0,0.2,0.05,8,1.4);
 			
 			Controller controller = new Controller(1,1,2d*Math.PI*70d*Math.pow(10, 6));
 			controller.set_d(6);
@@ -125,7 +151,7 @@ public class CulverReproductions {
 		System.out.println("Done!");
 	}
 	
-	
+	//vertical vs. diagonal positioning of Jingxuan's probe
 	public static void jingxuanVsStandard(String basename){
 		//Standard
 		Probe probeS = new Probe(
@@ -173,10 +199,11 @@ public class CulverReproductions {
 		double endZ = 1.7;
 		double dz = (endZ-startZ)/(numVoxelZ-1);
 		
+		double voxelDim = Math.pow(dx*dy*dz,1d/3d);
 		Phantom phantom = new Phantom(
 				startX, startY, startZ,
 				numVoxelX, numVoxelY, numVoxelZ,
-				dx, dy, dz,
+				dx, dy, dz, voxelDim,
 				0.05, 8, 1.4);
 		
 		
@@ -195,6 +222,7 @@ public class CulverReproductions {
 		culver2("culverReproduction//culver2_21mm_80x80",2.1,80);
 		culver2("culverReproduction//culver2_87mm_30x30",8.7,30);
 		culver3a("culverReproduction//culver3a_");
+		culver3aUnfixedFOV("culverReproduction//culver3aUnfixed_");
 		culver3b("culverReproduction//culver3b_");
 		culver4("culverReproduction//culver4_");
 	}
