@@ -1,11 +1,11 @@
 //Vincent Ching-Roa
-//Last edit: 10/13/2017
+//Last edit: 11/1/17
 //Description: 
 //Controller objects which performs analytic solutions
 //Laser properties are contained within the controller
 //Future plan: Might be better to move these properties(s, w) to the source
-//Log: 07/27 changed conversion factor and conversion factor structure
-//Log: 10/13 change max distance to 3.5
+//Trying to speed up controller by concurrency and parallelization
+//Using intStream Parallel speeds up by more than a factor of 2. look at StreamTest
 
 /*READ 
  * COORDINATE SYSTEM
@@ -31,6 +31,8 @@ import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.stream.IntStream;
+
 import complex.Complex;
 import probe.Source;
 import probe.Probe;
@@ -43,14 +45,15 @@ import org.ujmp.core.*;
 import org.ujmp.core.doublematrix.calculation.general.decomposition.SVD;
 
 
-public class Controller {
+public class ControllerParallel {
 	//Mode
 	int mode; //0 for semi-infinite 1 for infinite slab
 	
 	//Light and laser properties 
-	double c = 3*Math.pow(10,10); //speed of light
+	double c = 3*Math.pow(10,10); //speed of light in cm/s
 	double s; //intensity
 	double w; //omega frequency 70MHz in most cases
+	double lambda; //laser wavelength in cm
 	//Green's function stuff
 	double d; //slab thickness for infinite slab
 
@@ -70,7 +73,7 @@ public class Controller {
 		this.d=d;
 	}
 	
-	public Controller(int mode, double s, double w){ //0 for semi-infinite 1 for infinite slab configuration
+	public ControllerParallel(int mode, double s, double w){ //0 for semi-infinite 1 for infinite slab configuration
 		if(mode!=0 && mode!=1){
 			this.mode = 0;
 			return;
@@ -78,7 +81,18 @@ public class Controller {
 		this.mode = mode;
 		this.s = s;
 		this.w = w;
-		
+		this.lambda = 785*Math.pow(10, -7);
+	}
+	
+	public ControllerParallel(int mode, double s, double w, double lambda){ //0 for semi-infinite 1 for infinite slab configuration
+		if(mode!=0 && mode!=1){
+			this.mode = 0;
+			return;
+		}
+		this.mode = mode;
+		this.s = s;
+		this.w = w;
+		this.lambda = lambda;
 	}
 
 	/*Greens function for infinite slab boundary condition
@@ -230,29 +244,36 @@ public class Controller {
 		double absolute_detector_z = probe.getPosition()[t][2] + detector.getPosition()[2]; 
 		double absolute_detector_position[] = {absolute_detector_x,absolute_detector_y,absolute_detector_z};
 		
-		for(int i = 0; i < phantom.getVoxelList().size(); i++){
-			Voxel currentVoxel = phantom.getVoxelList().get(i);
-			double v = c/currentVoxel.getN(); //speed of light in the medium
-			double ltr = 1/(currentVoxel.getMua()+currentVoxel.getMusp()); //transport free mean path
-			double D = v*ltr/3; // photon diffusion coefficient
-			double conversionFactor = v*Math.pow(currentVoxel.getDim(),3)/D;
-			if(mode == 0){
-				output[i] = conversionFactor*
-						GSemiInfinite(absolute_source_position, currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())*
-						GSemiInfinite(absolute_detector_position, currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())/
-						GSemiInfinite(absolute_source_position, absolute_detector_position, currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN());
-			} else if (mode == 1){
-				output[i] = conversionFactor*
-						GInfiniteSlab(absolute_source_position, currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())*
-						GInfiniteSlab(absolute_detector_position,currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())/
-						GInfiniteSlab(absolute_source_position, absolute_detector_position, currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN());
-			}
-		}
+		IntStream.range(0, phantom.getVoxelList().size())
+			.parallel()
+			.forEach(i->weightMatrixMember(absolute_source_position,absolute_detector_position,phantom,i,output));
 		
 		return output;
 	}
 	
+	public void weightMatrixMember(double [] sourcePosition, double [] detectorPosition, Phantom phantom, int voxelCount, double[] output){
+		Voxel currentVoxel = phantom.getVoxelList().get(voxelCount);
+		double v = c/currentVoxel.getN(); //speed of light in the medium
+		double ltr = 1/(currentVoxel.getMua()+currentVoxel.getMusp()); //transport free mean path
+		double D = v*ltr/3; // photon diffusion coefficient
+		double conversionFactor = v*Math.pow(currentVoxel.getDim(),3)/D;
+		if(mode == 0){
+			output[voxelCount] = conversionFactor*
+					GSemiInfinite(sourcePosition, currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())*
+					GSemiInfinite(detectorPosition, currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())/
+					GSemiInfinite(sourcePosition, detectorPosition, currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN());
+		} else {
+			output[voxelCount] = conversionFactor*
+					GInfiniteSlab(sourcePosition, currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())*
+					GInfiniteSlab(detectorPosition,currentVoxel.getPosition(), currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN())/
+					GInfiniteSlab(sourcePosition, detectorPosition, currentVoxel.getMua(),currentVoxel.getMusp(),currentVoxel.getN());
+		}
+	}
 	
+	public void weightMatrixMemberDCT(double [] sourcePosition, double [] detectorPosition, Phantom phantom, int voxelCount, double [] output){
+		Voxel currentVoxel = phantom.getVoxelList().get(voxelCount);
+		//NOT FINISHED
+	}
 	
 	//Performs SVD on a double[][] matrix and prints the singular values in <filename>.dat
 	public double[] svdDirect(String filename, Probe probe, Phantom phantom){

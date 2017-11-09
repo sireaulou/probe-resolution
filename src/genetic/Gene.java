@@ -1,7 +1,8 @@
 //Vincent Ching-Roa
-//Last edit: 07/25/2017
+//Last edit: 08/7/2017
 //Description: 
 //Gene abstract class... maybe interface would've been better
+//Fixed silly comparator code
 
 package genetic;
 
@@ -73,16 +74,8 @@ public abstract class Gene implements Comparable<Gene>{
 	public int compareTo(Gene other) {
 		//extrapolated res fitness
 		if(this.res==0||other.res==0){
-			double thisRes = controller.res(controller.svdDirectNoOutput(probe,phantom), alpha, L);
-			double thatRes = controller.res(controller.svdDirectNoOutput(probe,phantom), alpha, L);
-			
-			if(thisRes>thatRes){
-				return 1;
-			} else if (thisRes<thatRes){
-				return -1;
-			} else {
-				return 0;
-			}
+			this.res();
+			other.res();
 		}
 		
 		if(this.res>other.res){

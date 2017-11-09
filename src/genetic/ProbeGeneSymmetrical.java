@@ -208,9 +208,9 @@ public class ProbeGeneSymmetrical extends Gene{
 	}
 	
 	//gene factory... gotta learn how to do this properly....
-		@Override
-		public Gene factory(){
-			return new ProbeGeneSymmetrical();
-		}
+	@Override
+	public Gene factory(){
+		return new ProbeGeneSymmetrical();
+	}
 	
 }

@@ -1,9 +1,11 @@
 //Vincent Ching-Roa
-//Last edit: 07/25/2017
+//Last edit: 10/13/2017
 //Description: 
 //Performs genetic algorithm.
 //Uses round robin selection or linear ranking selection (LRS).
 //Refer to my doc for round robin selection. I should update it for LRS....
+//Fixed silly LRS code (redundancy check)
+//Log: 10/13 Made phantom a param (why I didn't do this in the first place i dont know)
 
 package genetic;
 
@@ -78,14 +80,14 @@ public class GeneticAlgorithm<PGene extends Gene> {
 	
 	//param is any type of Gene that you are using... again terrible code
 	//mad cause bad
-	public void start(PGene t){
+	public void start(PGene t, Phantom phantom){
 		//Create phantom and controller
 		//set probe gene global properties
-		Phantom phantom = new Phantom(
-				-1,-1,1.5,
-				11,11,11,
-				0.2,0.2,0.2,0.2,
-				0.05,8,1.4);
+//		Phantom phantom = new Phantom(
+//				-1,-1,1.5,
+//				11,11,11,
+//				0.2,0.2,0.2,0.2,
+//				0.05,8,1.4);
 		Controller controller = new Controller(0, 1, 2d*Math.PI*70d*Math.pow(10, 6) );
 		PGene.setGlobalProps(numSource, numDetector, phantom, controller, alpha, L, mutationRate);
 		
@@ -199,7 +201,7 @@ public class GeneticAlgorithm<PGene extends Gene> {
 		int v = -1;
 		double check = 0;
 		double prevCheck = 0;
-		while(d==-1|v==-1|d==-1){
+		while(d==-1|v==-1|d==v){
 			double p = rand.nextDouble();
 			for(int i = 1; i < poolSize; i++){
 				check = (poolSize - (double) i )/(totalN) + prevCheck;

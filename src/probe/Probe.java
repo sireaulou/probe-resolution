@@ -1,8 +1,10 @@
 //Vincent Ching-Roa
-//Last edit: 07/24/2017
+//Last edit: 10/26/2017
 //Description: 
 //Probe object which holds sources and detectors
 //Also contains its own scan path
+//Updated fan probe configuration to the actual one
+//IRL design not the drafted design
 
 package probe;
 import java.util.LinkedList;
@@ -166,6 +168,34 @@ public class Probe {
 		}
 	}
 	
+	public void linear6x4(){
+		this.clear();
+		for(int i = 0; i<3; i++){
+			Source sourceRight = new Source(i*0.7+0.35,-1,0);
+			Source sourceLeft = new Source(-i*0.7-0.35,-1,0);
+			this.addSource(sourceRight);
+			this.addSource(sourceLeft);
+		}
+		for(int j = 0; j < 4; j ++){
+			Detector det = new Detector(-3+j*2,1,0);
+			this.addDetector(det);
+		}
+	}
+	
+	public void fan6x4(){
+		this.clear();
+		this.addSource(-2.07,-0.69,0);
+		this.addSource(-1.244,-0.985,0);
+		this.addSource(-0.5556,-0.95,0);
+		this.addSource(0.5556,-0.95,0);
+		this.addSource(1.244,-0.985,0);
+		this.addSource(2.07,-0.69,0);
+		this.addDetector(-1.495,1,0);
+		this.addDetector(-0.3,1,0);
+		this.addDetector(0.3,1,0);
+		this.addDetector(1.495,1,0);
+	}
+	
 	public void fan7x4(){
 		this.clear();
 		this.addSource(-2.07,-0.69,0);
@@ -175,10 +205,10 @@ public class Probe {
 		this.addSource(0.5556,-0.95,0);
 		this.addSource(1.244,-0.985,0);
 		this.addSource(2.07,-0.69,0);
-		this.addDetector(-3,1,0);
-		this.addDetector(-1,1,0);
-		this.addDetector(1,1,0);
-		this.addDetector(3,1,0);
+		this.addDetector(-1.495,1,0);
+		this.addDetector(-0.3,1,0);
+		this.addDetector(0.3,1,0);
+		this.addDetector(1.495,1,0);
 	}
 	
 	public void linear4x4(){

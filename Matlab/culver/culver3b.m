@@ -12,7 +12,7 @@ addpath('../functions');
 L = 60;
 M = 45*45;
 N = 900;
-sigma = 0.01;
+sigma = 0.001;
 S01 = 0.5;
 S02 = 0.05;
 vol = 6*6*0.2;
@@ -22,8 +22,8 @@ alpha2 = sqrt(1/M)*(sigma*sqrt(M))/(S02/vol);
 % alpha2 = alpha1*10;
 
 for i=1:8
-   s(i,:) = svdLoad(strcat('../../culverReproduction/069SD45Culver3b/069SD45Culver3b_',num2str(i)));
-   s1(i,:) = svdLoad(strcat('../../culverReproduction/0069SD45Culver3b/0069SD45Culver3b_',num2str(i)));
+   s(i,:) = svdLoad(strcat('../../culverReproduction/culver3b/culver3b_',num2str(i)));
+   s1(i,:) = svdLoad(strcat('../../culverReproduction/culver3b/culver3b_',num2str(i)));
    diff1 = abs(s(i,:)-alpha1);
    diff2 = abs(s1(i,:)-alpha2);
    [m1,ind1] = min(diff1);
